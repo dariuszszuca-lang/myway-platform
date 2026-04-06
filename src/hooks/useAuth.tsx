@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from 'react'
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -22,7 +22,7 @@ export function isAdminEmail(email: string): boolean {
 
 export interface UserProfile {
   name: string
-  sobrietyDate: string // ISO date string
+  sobrietyDate: string
   role: 'patient' | 'therapist'
   createdAt: string
 }
@@ -32,7 +32,7 @@ interface AuthContextType {
   profile: UserProfile | null
   loading: boolean
   signIn: (email: string, password: string) => Promise<UserProfile | null>
-  signUp: (email: string, password: string, name: string, sobrietyDate: string) => Promise<void>
+  signUp: (email: string, password: string, name: string, sobrietyDate?: string) => Promise<void>
   signOut: () => Promise<void>
 }
 
@@ -42,15 +42,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
+  const profileLoaded = useRef(false)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser)
       if (firebaseUser) {
-        const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
-        if (snap.exists()) {
-          setProfile(snap.data() as UserProfile)
+        // Skip Firestore read if signIn/signUp already loaded the profile
+        if (!profileLoaded.current) {
+          const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
+          if (snap.exists()) {
+            setProfile(snap.data() as UserProfile)
+          }
         }
+        profileLoaded.current = false
       } else {
         setProfile(null)
       }
@@ -64,11 +69,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const snap = await getDoc(doc(db, 'users', cred.user.uid))
     if (snap.exists()) {
       const p = snap.data() as UserProfile
-      // Auto-fix: admin z rolą patient → upgrade do therapist
       if (isAdminEmail(email) && p.role !== 'therapist') {
         p.role = 'therapist'
         await updateDoc(doc(db, 'users', cred.user.uid), { role: 'therapist' })
       }
+      profileLoaded.current = true
       setProfile(p)
       return p
     }
@@ -85,6 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       createdAt: new Date().toISOString(),
     }
     await setDoc(doc(db, 'users', cred.user.uid), newProfile)
+    profileLoaded.current = true
     setProfile(newProfile)
   }
 
