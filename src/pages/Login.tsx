@@ -18,12 +18,7 @@ export default function Login() {
     setInfo('')
     setLoading(true)
     try {
-      const profile = await signIn(email, password)
-      if (profile?.role !== 'therapist') {
-        setError('Brak uprawnień. Platforma tylko dla terapeutów.')
-        setLoading(false)
-        return
-      }
+      await signIn(email, password)
       window.location.href = '/'
     } catch {
       setError('Nieprawidłowy email lub hasło')
