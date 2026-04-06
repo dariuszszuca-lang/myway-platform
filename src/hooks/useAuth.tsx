@@ -6,7 +6,7 @@ import {
   signOut as firebaseSignOut,
   type User,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { auth, db } from '../lib/firebase'
 
 const ADMIN_EMAILS = [
@@ -64,6 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const snap = await getDoc(doc(db, 'users', cred.user.uid))
     if (snap.exists()) {
       const p = snap.data() as UserProfile
+      // Auto-fix: admin z rolą patient → upgrade do therapist
+      if (isAdminEmail(email) && p.role !== 'therapist') {
+        p.role = 'therapist'
+        await updateDoc(doc(db, 'users', cred.user.uid), { role: 'therapist' })
+      }
       setProfile(p)
       return p
     }

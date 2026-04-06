@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { sendPasswordResetEmail } from 'firebase/auth'
+import { auth } from '../lib/firebase'
 import { useAuth } from '../hooks/useAuth'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [info, setInfo] = useState('')
   const [loading, setLoading] = useState(false)
   const { signIn } = useAuth()
   const navigate = useNavigate()
@@ -13,6 +16,7 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setInfo('')
     setLoading(true)
     try {
       const profile = await signIn(email, password)
@@ -35,13 +39,17 @@ export default function Login() {
         <div className="text-center">
           <img src="/favicon.svg" alt="MyWay" className="w-20 h-20 mx-auto mb-5" style={{ borderRadius: 22, boxShadow: '0 0 40px rgba(124, 58, 237, 0.3)' }} />
           <h1 className="text-[34px] font-black text-white tracking-tight">MyWay</h1>
-          <p className="text-[14px] font-bold mt-1" style={{ color: '#22d3ee' }}>Panel terapeuty</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="rounded-xl p-3 text-[12px] font-black text-center" style={{ background: 'rgba(244,63,94,0.12)', border: '1px solid rgba(244,63,94,0.3)', color: '#fb7185' }}>
               {error}
+            </div>
+          )}
+          {info && (
+            <div className="rounded-xl p-3 text-[12px] font-black text-center" style={{ background: 'rgba(34,211,238,0.12)', border: '1px solid rgba(34,211,238,0.3)', color: '#22d3ee' }}>
+              {info}
             </div>
           )}
           <div>
@@ -56,6 +64,13 @@ export default function Login() {
             className="w-full text-[15px] font-black py-3.5 rounded-xl transition-all disabled:opacity-40 text-white mt-2"
             style={{ background: 'linear-gradient(135deg, #0891b2, #22d3ee)' }}>
             {loading ? 'Logowanie...' : 'Zaloguj się'}
+          </button>
+          <button type="button" onClick={async () => {
+            if (!email) { setError('Wpisz email'); return }
+            try { await sendPasswordResetEmail(auth, email); setError(''); setInfo('Link do resetu hasła wysłany na ' + email) }
+            catch { setError('Nie udało się wysłać maila') }
+          }} className="w-full text-[13px] font-bold py-2 text-center" style={{ color: '#5a6178' }}>
+            Zapomniałem hasła
           </button>
         </form>
 
