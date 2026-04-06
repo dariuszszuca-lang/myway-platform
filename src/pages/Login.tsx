@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { auth } from '../lib/firebase'
 import { useAuth } from '../hooks/useAuth'
@@ -11,7 +11,6 @@ export default function Login() {
   const [info, setInfo] = useState('')
   const [loading, setLoading] = useState(false)
   const { signIn } = useAuth()
-  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,10 +24,9 @@ export default function Login() {
         setLoading(false)
         return
       }
-      navigate('/')
+      window.location.href = '/'
     } catch {
       setError('Nieprawidłowy email lub hasło')
-    } finally {
       setLoading(false)
     }
   }

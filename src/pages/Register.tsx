@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 export default function Register() {
@@ -10,7 +10,6 @@ export default function Register() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const { signUp } = useAuth()
-  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,12 +21,15 @@ export default function Register() {
     }
 
     setLoading(true)
+    setError('')
     try {
-      await signUp(email, password, name, sobrietyDate)
-      navigate('/')
-    } catch {
-      setError('Nie udało się utworzyć konta. Spróbuj inny email.')
-    } finally {
+      setError('Tworzę konto...')
+      await signUp(email, password, name, sobrietyDate || undefined)
+      setError('Konto utworzone! Przekierowuję...')
+      window.location.href = '/'
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Nieznany błąd'
+      setError('Błąd: ' + msg)
       setLoading(false)
     }
   }
