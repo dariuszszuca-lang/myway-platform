@@ -6,8 +6,8 @@ import {
   signOut as firebaseSignOut,
   type User,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
-import { auth, db } from '../lib/firebase'
+import { auth } from '../lib/firebase'
+import { getProfile, setProfile as restSetProfile } from '../lib/firestore-rest'
 
 const ADMIN_EMAILS = [
   'krystiannagaba@gmail.com',
@@ -58,8 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return
       }
       try {
-        const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
-        if (snap.exists()) setProfile(snap.data() as UserProfile)
+        const data = await getProfile(firebaseUser.uid)
+        if (data) setProfile(data as unknown as UserProfile)
       } catch { /* ignore */ }
       setLoading(false)
     })
@@ -69,12 +69,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (email: string, password: string): Promise<UserProfile | null> => {
     skipNextAuthRead.current = true
     const cred = await signInWithEmailAndPassword(auth, email, password)
-    const snap = await getDoc(doc(db, 'users', cred.user.uid))
-    if (snap.exists()) {
-      const p = snap.data() as UserProfile
+    const data = await getProfile(cred.user.uid)
+    if (data) {
+      const p = data as unknown as UserProfile
       if (isAdminEmail(email) && p.role !== 'therapist') {
         p.role = 'therapist'
-        await updateDoc(doc(db, 'users', cred.user.uid), { role: 'therapist' })
+        await restSetProfile(cred.user.uid, { ...data, role: 'therapist' })
       }
       setProfile(p)
       setLoading(false)
@@ -88,14 +88,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     skipNextAuthRead.current = true
     const cred = await createUserWithEmailAndPassword(auth, email, password)
     const role = isAdminEmail(email) ? 'therapist' : 'patient'
-    const newProfile: UserProfile = {
+    const profileData = {
       name,
       sobrietyDate: sobrietyDate || '',
       role,
       createdAt: new Date().toISOString(),
     }
-    await setDoc(doc(db, 'users', cred.user.uid), newProfile)
-    setProfile(newProfile)
+    await restSetProfile(cred.user.uid, profileData)
+    setProfile(profileData as UserProfile)
     setLoading(false)
   }
 

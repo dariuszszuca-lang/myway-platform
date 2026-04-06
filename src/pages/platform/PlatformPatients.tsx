@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { collection, getDocs, query, orderBy, limit, Timestamp } from 'firebase/firestore'
-import { db } from '../../lib/firebase'
+import { getCollection, runQuery } from '../../lib/firestore-rest'
 import type { UserProfile } from '../../hooks/useAuth'
 
 interface Patient {
@@ -33,12 +32,12 @@ export default function PlatformPatients() {
 
   const loadPatients = async () => {
     try {
-    const snap = await getDocs(collection(db, 'users'))
+    const users = await getCollection('users')
     const now = new Date()
     const list: Patient[] = []
 
-    for (const d of snap.docs) {
-      const data = d.data() as UserProfile
+    for (const d of users) {
+      const data = d as unknown as UserProfile & { id: string }
       if (data.role !== 'patient') continue
       const days = Math.floor((now.getTime() - new Date(data.sobrietyDate).getTime()) / (1000 * 60 * 60 * 24))
 
@@ -46,12 +45,15 @@ export default function PlatformPatients() {
       let journalCount = 0
       const recentMoods: number[] = []
       try {
-        const jSnap = await getDocs(query(collection(db, 'users', d.id, 'journal'), orderBy('createdAt', 'desc'), limit(10)))
-        journalCount = jSnap.size
-        for (const j of jSnap.docs) {
-          recentMoods.push(j.data().mood)
+        const journalDocs = await runQuery(`users/${d.id}/journal`, {
+          orderBy: { field: 'createdAt', direction: 'DESCENDING' },
+          limit: 10,
+        })
+        journalCount = journalDocs.length
+        for (const j of journalDocs) {
+          recentMoods.push(Number(j.mood) || 0)
         }
-        if (jSnap.docs.length > 0) lastMood = jSnap.docs[0].data().mood
+        if (journalDocs.length > 0) lastMood = Number(journalDocs[0].mood) || null
       } catch { /* skip */ }
 
       list.push({
@@ -70,11 +72,16 @@ export default function PlatformPatients() {
   const openProfile = async (uid: string) => {
     setSelected(uid)
     setLoadingJournal(true)
-    const q = query(collection(db, 'users', uid, 'journal'), orderBy('createdAt', 'desc'), limit(30))
-    const snap = await getDocs(q)
-    setJournal(snap.docs.map((d) => ({
-      id: d.id, ...d.data(), createdAt: (d.data().createdAt as Timestamp).toDate(),
-    })) as JournalEntry[])
+    const journalDocs = await runQuery(`users/${uid}/journal`, {
+      orderBy: { field: 'createdAt', direction: 'DESCENDING' },
+      limit: 30,
+    })
+    setJournal(journalDocs.map((d) => ({
+      id: d.id,
+      mood: Number(d.mood) || 0,
+      note: String(d.note || ''),
+      createdAt: d.createdAt ? new Date(d.createdAt as string) : new Date(),
+    })))
     setLoadingJournal(false)
   }
 

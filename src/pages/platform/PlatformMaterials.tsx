@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, Timestamp } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { db, storage } from '../../lib/firebase'
+import { storage } from '../../lib/firebase'
+import { runQuery, addDoc as restAddDoc, deleteDoc as restDeleteDoc } from '../../lib/firestore-rest'
 
 export default function PlatformMaterials() {
   const [title, setTitle] = useState('')
@@ -14,8 +14,14 @@ export default function PlatformMaterials() {
 
   useEffect(() => { load() }, [])
   const load = async () => {
-    const snap = await getDocs(query(collection(db, 'materials'), orderBy('createdAt', 'desc')))
-    setMaterials(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as any)
+    const docs = await runQuery('materials', { orderBy: { field: 'createdAt', direction: 'DESCENDING' } })
+    setMaterials(docs.map((d) => ({
+      id: d.id,
+      title: String(d.title || ''),
+      category: String(d.category || ''),
+      premium: Boolean(d.premium),
+      description: String(d.description || ''),
+    })))
   }
 
   const upload = async () => {
@@ -25,14 +31,21 @@ export default function PlatformMaterials() {
       const fileRef = ref(storage, `materials/${Date.now()}_${file.name}`)
       await uploadBytes(fileRef, file)
       const fileUrl = await getDownloadURL(fileRef)
-      await addDoc(collection(db, 'materials'), { title: title.trim(), description: description.trim(), category, premium, fileUrl, createdAt: Timestamp.now() })
+      await restAddDoc('materials', {
+        title: title.trim(),
+        description: description.trim(),
+        category,
+        premium,
+        fileUrl,
+        createdAt: new Date().toISOString(),
+      })
       setTitle(''); setDescription(''); setFile(null); setPremium(false)
       await load()
     } finally { setUploading(false) }
   }
 
   const remove = async (id: string) => {
-    await deleteDoc(doc(db, 'materials', id))
+    await restDeleteDoc(`materials/${id}`)
     setMaterials((prev) => prev.filter((m) => m.id !== id))
   }
 

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, Timestamp } from 'firebase/firestore'
-import { db } from '../../lib/firebase'
+import { runQuery, addDoc as restAddDoc, deleteDoc as restDeleteDoc } from '../../lib/firestore-rest'
 import { useAuth } from '../../hooks/useAuth'
 
 interface SessionSlot {
@@ -15,15 +14,31 @@ export default function PlatformSessions() {
 
   useEffect(() => { load() }, [])
   const load = async () => {
-    const snap = await getDocs(query(collection(db, 'sessions'), orderBy('date', 'asc')))
-    setSlots(snap.docs.map((d) => ({ id: d.id, ...d.data() })) as SessionSlot[])
+    const docs = await runQuery('sessions', { orderBy: { field: 'date', direction: 'ASCENDING' } })
+    setSlots(docs.map((d) => ({
+      id: d.id,
+      therapistName: String(d.therapistName || ''),
+      date: String(d.date || ''),
+      time: String(d.time || ''),
+      booked: Boolean(d.booked),
+      bookedByName: d.bookedByName ? String(d.bookedByName) : undefined,
+    })))
   }
   const add = async () => {
     if (!date || !time || !profile) return; setAdding(true)
-    await addDoc(collection(db, 'sessions'), { therapistName: profile.name, date, time, booked: false, createdAt: Timestamp.now() })
+    await restAddDoc('sessions', {
+      therapistName: profile.name,
+      date,
+      time,
+      booked: false,
+      createdAt: new Date().toISOString(),
+    })
     setDate(''); setTime(''); await load(); setAdding(false)
   }
-  const remove = async (id: string) => { await deleteDoc(doc(db, 'sessions', id)); setSlots(p => p.filter(s => s.id !== id)) }
+  const remove = async (id: string) => {
+    await restDeleteDoc(`sessions/${id}`)
+    setSlots(p => p.filter(s => s.id !== id))
+  }
 
   const today = new Date().toISOString().split('T')[0]
   const upcoming = slots.filter(s => s.date >= today)

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
-import { collection, getDocs, query, orderBy, limit, Timestamp } from 'firebase/firestore'
-import { db } from '../../lib/firebase'
+import { getCollection, runQuery, type RestDoc } from '../../lib/firestore-rest'
 import type { UserProfile } from '../../hooks/useAuth'
 
 interface Stats {
@@ -22,8 +21,8 @@ export default function PlatformDashboard() {
 
   const loadStats = async () => {
     try {
-    const usersSnap = await getDocs(collection(db, 'users'))
-    const sessionsSnap = await getDocs(collection(db, 'sessions')).catch(() => ({ docs: [] }))
+    const users = await getCollection('users')
+    const sessions = await getCollection('sessions').catch(() => [] as RestDoc[])
     const now = new Date()
     const today = now.toISOString().split('T')[0]
 
@@ -34,34 +33,37 @@ export default function PlatformDashboard() {
     const recentEntries: Stats['recentEntries'] = []
     const moodDistribution = Array(10).fill(0)
 
-    for (const d of usersSnap.docs) {
-      const data = d.data() as UserProfile
+    for (const d of users) {
+      const data = d as unknown as UserProfile & { id: string }
       if (data.role !== 'patient') continue
       totalPatients++
       const days = Math.floor((now.getTime() - new Date(data.sobrietyDate).getTime()) / (1000 * 60 * 60 * 24))
       totalDays += days
 
       try {
-        const jSnap = await getDocs(
-          query(collection(db, 'users', d.id, 'journal'), orderBy('createdAt', 'desc'), limit(5))
-        )
-        for (const j of jSnap.docs) {
-          const entry = j.data()
-          totalMood += entry.mood
+        const journalDocs = await runQuery(`users/${d.id}/journal`, {
+          orderBy: { field: 'createdAt', direction: 'DESCENDING' },
+          limit: 5,
+        })
+        for (const j of journalDocs) {
+          const mood = Number(j.mood) || 0
+          totalMood += mood
           moodCount++
-          moodDistribution[entry.mood - 1]++
+          if (mood >= 1 && mood <= 10) moodDistribution[mood - 1]++
           if (recentEntries.length < 8) {
+            const createdAt = j.createdAt as string
+            const dateObj = createdAt ? new Date(createdAt) : new Date()
             recentEntries.push({
               name: data.name,
-              mood: entry.mood,
-              date: (entry.createdAt as Timestamp).toDate().toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
+              mood,
+              date: dateObj.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }),
             })
           }
         }
       } catch { /* skip */ }
     }
 
-    const sessionsToday = sessionsSnap.docs.filter((s) => s.data().date === today && s.data().booked).length
+    const sessionsToday = sessions.filter((s) => s.date === today && s.booked).length
 
     setStats({
       totalPatients,
