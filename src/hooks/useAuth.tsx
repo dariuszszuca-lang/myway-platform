@@ -70,12 +70,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return null
   }
 
-  const signUp = async (email: string, password: string, name: string, sobrietyDate: string) => {
+  const signUp = async (email: string, password: string, name: string, sobrietyDate?: string) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password)
     const role = isAdminEmail(email) ? 'therapist' : 'patient'
     const newProfile: UserProfile = {
       name,
-      sobrietyDate,
+      sobrietyDate: sobrietyDate || '',
       role,
       createdAt: new Date().toISOString(),
     }

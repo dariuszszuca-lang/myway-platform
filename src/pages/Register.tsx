@@ -90,13 +90,12 @@ export default function Register() {
 
           <div>
             <label className="block text-sm font-medium text-text-secondary mb-1.5">
-              Data rozpoczęcia trzeźwości
+              Data rozpoczęcia trzeźwości <span className="text-text-muted">(opcjonalne)</span>
             </label>
             <input
               type="date"
               value={sobrietyDate}
               onChange={(e) => setSobrietyDate(e.target.value)}
-              required
               className="w-full bg-bg-secondary border border-border rounded-xl px-4 py-3 text-text-primary focus:outline-none focus:border-accent-green/50"
             />
             <p className="text-xs text-text-muted mt-1">Od kiedy liczysz trzeźwość?</p>
