@@ -4,7 +4,8 @@ import { useAuth } from '../hooks/useAuth'
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, profile, loading } = useAuth()
 
-  if (loading) {
+  // Czekaj na auth i profil
+  if (loading || (user && !profile)) {
     return (
       <div className="flex items-center justify-center min-h-dvh bg-bg-primary">
         <div className="w-8 h-8 border-2 border-accent-green border-t-transparent rounded-full animate-spin" />
@@ -16,7 +17,6 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     return <Navigate to="/login" replace />
   }
 
-  // Tylko terapeuci mają dostęp do platformy
   if (profile?.role !== 'therapist') {
     return (
       <div className="flex items-center justify-center min-h-dvh bg-bg-primary">

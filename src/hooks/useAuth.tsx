@@ -42,29 +42,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
-  const profileLoaded = useRef(false)
+  const skipNextAuthRead = useRef(false)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser)
-      if (firebaseUser) {
-        // Skip Firestore read if signIn/signUp already loaded the profile
-        if (!profileLoaded.current) {
-          const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
-          if (snap.exists()) {
-            setProfile(snap.data() as UserProfile)
-          }
-        }
-        profileLoaded.current = false
-      } else {
+      if (!firebaseUser) {
         setProfile(null)
+        setLoading(false)
+        return
       }
+      if (skipNextAuthRead.current) {
+        skipNextAuthRead.current = false
+        setLoading(false)
+        return
+      }
+      try {
+        const snap = await getDoc(doc(db, 'users', firebaseUser.uid))
+        if (snap.exists()) setProfile(snap.data() as UserProfile)
+      } catch { /* ignore */ }
       setLoading(false)
     })
     return unsubscribe
   }, [])
 
   const signIn = async (email: string, password: string): Promise<UserProfile | null> => {
+    skipNextAuthRead.current = true
     const cred = await signInWithEmailAndPassword(auth, email, password)
     const snap = await getDoc(doc(db, 'users', cred.user.uid))
     if (snap.exists()) {
@@ -73,14 +76,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         p.role = 'therapist'
         await updateDoc(doc(db, 'users', cred.user.uid), { role: 'therapist' })
       }
-      profileLoaded.current = true
       setProfile(p)
+      setLoading(false)
       return p
     }
+    setLoading(false)
     return null
   }
 
   const signUp = async (email: string, password: string, name: string, sobrietyDate?: string) => {
+    skipNextAuthRead.current = true
     const cred = await createUserWithEmailAndPassword(auth, email, password)
     const role = isAdminEmail(email) ? 'therapist' : 'patient'
     const newProfile: UserProfile = {
@@ -90,8 +95,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       createdAt: new Date().toISOString(),
     }
     await setDoc(doc(db, 'users', cred.user.uid), newProfile)
-    profileLoaded.current = true
     setProfile(newProfile)
+    setLoading(false)
   }
 
   const signOut = async () => {
