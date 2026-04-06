@@ -37,10 +37,9 @@ export default function Register() {
       <div className="max-w-sm mx-auto w-full space-y-8">
         {/* Logo */}
         <div className="text-center">
-          <h1 className="text-3xl font-extrabold text-text-primary">
-            MyWay <span className="text-accent-green">App</span>
-          </h1>
-          <p className="text-text-secondary text-sm mt-2">Rozpocznij swoją drogę</p>
+          <img src="/favicon.svg" alt="MyWay" className="w-20 h-20 mx-auto mb-5" style={{ borderRadius: 22, boxShadow: '0 0 40px rgba(124, 58, 237, 0.3)' }} />
+          <h1 className="text-[34px] font-black text-white tracking-tight">MyWay</h1>
+          <p className="text-[14px] font-bold mt-1" style={{ color: '#22d3ee' }}>Utwórz konto</p>
         </div>
 
         {/* Form */}

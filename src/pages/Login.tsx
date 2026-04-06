@@ -33,9 +33,7 @@ export default function Login() {
     <div className="min-h-dvh flex flex-col justify-center px-6" style={{ background: '#13111c' }}>
       <div className="max-w-sm mx-auto w-full space-y-10">
         <div className="text-center">
-          <div className="w-20 h-20 mx-auto mb-5 flex items-center justify-center" style={{ borderRadius: 22, background: 'linear-gradient(135deg, #0891b2, #22d3ee)', boxShadow: '0 0 40px rgba(8, 145, 178, 0.3)' }}>
-            <span className="text-white font-black text-3xl" style={{ fontFamily: 'var(--font-mono)' }}>M</span>
-          </div>
+          <img src="/favicon.svg" alt="MyWay" className="w-20 h-20 mx-auto mb-5" style={{ borderRadius: 22, boxShadow: '0 0 40px rgba(124, 58, 237, 0.3)' }} />
           <h1 className="text-[34px] font-black text-white tracking-tight">MyWay</h1>
           <p className="text-[14px] font-bold mt-1" style={{ color: '#22d3ee' }}>Panel terapeuty</p>
         </div>
