@@ -25,9 +25,7 @@ export default function PlatformLayout() {
         {/* Logo */}
         <div className="p-6 pb-6">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #7c3aed, #22d3ee)' }}>
-              <span className="text-white font-black text-xl" style={{ fontFamily: 'var(--font-mono)' }}>M</span>
-            </div>
+            <img src="/favicon.svg" alt="MyWay" className="w-11 h-11" style={{ borderRadius: 12 }} />
             <div>
               <p className="text-white font-black text-base tracking-tight">MyWay</p>
               <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: '#e879f9' }}>Platform</p>
@@ -80,7 +78,6 @@ export default function PlatformLayout() {
               </div>
               <div>
                 <p className="text-white text-xs font-bold">{profile?.name}</p>
-                <p className="text-[10px] font-bold" style={{ color: '#5a6178' }}>Terapeuta</p>
               </div>
             </div>
             <button onClick={signOut} className="hover:opacity-80 transition-opacity" style={{ color: '#5a6178' }}>

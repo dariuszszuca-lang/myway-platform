@@ -13,23 +13,16 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError('')
-
-    if (password.length < 6) {
-      setError('Hasło musi mieć minimum 6 znaków')
-      return
-    }
+    if (password.length < 6) { setError('Hasło musi mieć minimum 6 znaków'); return }
 
     setLoading(true)
     setError('')
     try {
-      setError('Tworzę konto...')
       await signUp(email, password, name, sobrietyDate || undefined)
-      setError('Konto utworzone! Przekierowuję...')
       window.location.href = '/'
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Nieznany błąd'
-      setError('Błąd: ' + msg)
+      const code = (err as { code?: string })?.code || ''
+      setError(code === 'auth/email-already-in-use' ? 'Ten email jest już zajęty.' : 'Nie udało się utworzyć konta.')
       setLoading(false)
     }
   }
@@ -37,86 +30,43 @@ export default function Register() {
   return (
     <div className="min-h-dvh bg-bg-primary flex flex-col justify-center px-6">
       <div className="max-w-sm mx-auto w-full space-y-8">
-        {/* Logo */}
         <div className="text-center">
           <img src="/favicon.svg" alt="MyWay" className="w-20 h-20 mx-auto mb-5" style={{ borderRadius: 22, boxShadow: '0 0 40px rgba(124, 58, 237, 0.3)' }} />
           <h1 className="text-[34px] font-black text-white tracking-tight">MyWay</h1>
-          <p className="text-[14px] font-bold mt-1" style={{ color: '#22d3ee' }}>Utwórz konto</p>
         </div>
 
-        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-accent-red/10 border border-accent-red/30 rounded-xl p-3 text-sm text-accent-red text-center">
+            <div className="rounded-xl p-3 text-[12px] font-black text-center" style={{ background: 'rgba(244,63,94,0.12)', border: '1px solid rgba(244,63,94,0.3)', color: '#fb7185' }}>
               {error}
             </div>
           )}
-
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Twoje imię</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="input-dark"
-              placeholder="np. Tomek"
-            />
+            <label className="block text-[12px] font-black mb-2" style={{ color: '#a0aec0' }}>Twoje imię</label>
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} required className="input-dark" placeholder="np. Tomek" />
           </div>
-
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className="input-dark"
-              placeholder="twoj@email.pl"
-            />
+            <label className="block text-[12px] font-black mb-2" style={{ color: '#a0aec0' }}>Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" className="input-dark" placeholder="twoj@email.pl" />
           </div>
-
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">Hasło</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="new-password"
-              className="input-dark"
-              placeholder="Minimum 6 znaków"
-            />
+            <label className="block text-[12px] font-black mb-2" style={{ color: '#a0aec0' }}>Hasło</label>
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="new-password" className="input-dark" placeholder="Minimum 6 znaków" />
           </div>
-
           <div>
-            <label className="block text-sm font-medium text-text-secondary mb-1.5">
-              Data rozpoczęcia trzeźwości <span className="text-text-muted">(opcjonalne)</span>
+            <label className="block text-[12px] font-black mb-2" style={{ color: '#a0aec0' }}>
+              Data trzeźwości <span style={{ color: '#5a6178' }}>(opcjonalne)</span>
             </label>
-            <input
-              type="date"
-              value={sobrietyDate}
-              onChange={(e) => setSobrietyDate(e.target.value)}
-              className="w-full bg-bg-secondary border border-border rounded-xl px-4 py-3 text-text-primary focus:outline-none focus:border-accent-green/50"
-            />
-            <p className="text-xs text-text-muted mt-1">Od kiedy liczysz trzeźwość?</p>
+            <input type="date" value={sobrietyDate} onChange={(e) => setSobrietyDate(e.target.value)} className="input-dark" />
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-accent-green text-bg-primary font-semibold py-3 rounded-xl transition-opacity disabled:opacity-50"
-          >
+          <button type="submit" disabled={loading}
+            className="w-full text-[15px] font-black py-3.5 rounded-xl transition-all disabled:opacity-40 text-white mt-2"
+            style={{ background: 'linear-gradient(135deg, #0891b2, #22d3ee)' }}>
             {loading ? 'Tworzę konto...' : 'Utwórz konto'}
           </button>
         </form>
-
-        <p className="text-center text-sm text-text-muted">
-          Masz już konto?{' '}
-          <Link to="/login" className="text-accent-green font-medium">
-            Zaloguj się
-          </Link>
+        <p className="text-center text-[12px] font-bold" style={{ color: '#5a6178' }}>
+          Masz już konto? <Link to="/login" className="font-black" style={{ color: '#22d3ee' }}>Zaloguj się</Link>
         </p>
       </div>
     </div>
