@@ -84,7 +84,7 @@ export default function PlatformDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#a78bfa', borderTopColor: 'transparent' }} />
+        <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#72d5c7', borderTopColor: 'transparent' }} />
       </div>
     )
   }
@@ -95,43 +95,44 @@ export default function PlatformDashboard() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-[28px] font-black text-white">Dashboard</h1>
-        <p className="text-[13px] font-bold mt-1" style={{ color: '#5a6178' }}>Przegląd aktywności pacjentów</p>
+        <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#d6a85f]">MyWay Platform</p>
+        <h1 className="text-[34px] font-black text-text-primary tracking-tight">Dashboard</h1>
+        <p className="text-[13px] font-bold mt-1 text-text-secondary/70">Przegląd aktywności pacjentów</p>
       </div>
 
       {/* KPI Cards — 2 large gradient + 2 dark */}
       <div className="grid grid-cols-4 gap-5">
         {/* Large gradient: Patients */}
         <div className="gradient-purple p-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.3), transparent)', transform: 'translate(30%, -30%)' }} />
+          <div className="absolute top-0 right-0 w-28 h-28 rounded-full opacity-50" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.8), transparent)', transform: 'translate(30%, -30%)' }} />
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.2)' }}>
+            <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(7,20,17,0.1)' }}>
               <UsersIcon />
             </div>
-            <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>Pacjenci</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#52655b]">Pacjenci</p>
           </div>
-          <p className="text-[42px] font-black text-white leading-none" style={{ fontFamily: 'var(--font-mono)' }}>{stats.totalPatients}</p>
-          <p className="text-[11px] font-bold mt-2" style={{ color: 'rgba(255,255,255,0.5)' }}>Aktywnych w systemie</p>
+          <p className="text-[48px] font-black text-[#071411] leading-none" style={{ fontFamily: 'var(--font-mono)' }}>{stats.totalPatients}</p>
+          <p className="text-[11px] font-bold mt-2 text-[#52655b]">Aktywnych w systemie</p>
         </div>
 
         {/* Large gradient: Avg Mood */}
         <div className="gradient-cyan p-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.3), transparent)', transform: 'translate(30%, -30%)' }} />
+          <div className="absolute top-0 right-0 w-28 h-28 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(255,255,255,0.55), transparent)', transform: 'translate(30%, -30%)' }} />
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.2)' }}>
+            <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.14)' }}>
               <MoodIcon />
             </div>
             <p className="text-xs font-bold uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.7)' }}>Średni nastrój</p>
           </div>
-          <p className="text-[42px] font-black text-white leading-none" style={{ fontFamily: 'var(--font-mono)' }}>{stats.avgMood}<span className="text-lg opacity-50">/10</span></p>
+          <p className="text-[48px] font-black text-white leading-none" style={{ fontFamily: 'var(--font-mono)' }}>{stats.avgMood}<span className="text-lg opacity-50">/10</span></p>
           <p className="text-[11px] font-bold mt-2" style={{ color: 'rgba(255,255,255,0.5)' }}>Wszystkich pacjentów</p>
         </div>
 
         {/* Dark card: Avg Days */}
         <div className="dark-card p-6">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(167, 139, 250, 0.15)' }}>
-              <CalendarIcon color="#a78bfa" />
+            <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(214, 168, 95, 0.18)' }}>
+              <CalendarIcon color="#d6a85f" />
             </div>
             <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#5a6178' }}>Śr. dni trzeźw.</p>
           </div>
@@ -142,8 +143,8 @@ export default function PlatformDashboard() {
         {/* Dark card: Sessions Today */}
         <div className="dark-card p-6">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(45, 212, 191, 0.15)' }}>
-              <SessionIcon color="#2dd4bf" />
+            <div className="w-9 h-9 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(114, 213, 199, 0.16)' }}>
+              <SessionIcon color="#72d5c7" />
             </div>
             <p className="text-xs font-bold uppercase tracking-wider" style={{ color: '#5a6178' }}>Sesje dziś</p>
           </div>
@@ -161,10 +162,10 @@ export default function PlatformDashboard() {
               const maxCount = Math.max(...stats.moodDistribution, 1)
               const height = (count / maxCount) * 100
               const getColor = () => {
-                if (i >= 7) return '#2dd4bf'
-                if (i >= 5) return '#22d3ee'
-                if (i >= 3) return '#a78bfa'
-                return '#e879f9'
+                if (i >= 7) return '#72d5c7'
+                if (i >= 5) return '#7db7d7'
+                if (i >= 3) return '#d6a85f'
+                return '#e85f5c'
               }
               return (
                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
@@ -193,10 +194,10 @@ export default function PlatformDashboard() {
           ) : (
             <div className="space-y-2.5">
               {stats.recentEntries.map((e, i) => {
-                const avatarColors = ['#7c3aed', '#0891b2', '#e879f9', '#2dd4bf', '#a78bfa', '#22d3ee', '#f59e0b', '#f43f5e']
+                const avatarColors = ['#72d5c7', '#7db7d7', '#d6a85f', '#b6a4e6', '#5ab7c0', '#d58aa6', '#2fbf9b', '#e85f5c']
                 const avatarBg = avatarColors[i % avatarColors.length]
                 return (
-                  <div key={i} className="flex items-center justify-between py-1.5" style={{ borderBottom: i < stats.recentEntries.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none' }}>
+                  <div key={i} className="flex items-center justify-between py-1.5" style={{ borderBottom: i < stats.recentEntries.length - 1 ? '1px solid rgba(245,232,204,0.08)' : 'none' }}>
                     <div className="flex items-center gap-3">
                       <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold" style={{ background: avatarBg }}>
                         {e.name.charAt(0)}
@@ -206,7 +207,7 @@ export default function PlatformDashboard() {
                         <p className="text-[11px] font-medium" style={{ color: '#5a6178' }}>{e.date}</p>
                       </div>
                     </div>
-                    <div className="text-sm font-bold" style={{ color: e.mood >= 7 ? '#2dd4bf' : e.mood >= 4 ? '#f59e0b' : '#f43f5e' }}>
+                    <div className="text-sm font-bold" style={{ color: e.mood >= 7 ? '#72d5c7' : e.mood >= 4 ? '#d6a85f' : '#e85f5c' }}>
                       {e.mood}/10
                     </div>
                   </div>
@@ -220,7 +221,7 @@ export default function PlatformDashboard() {
   )
 }
 
-function UsersIcon() { return <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg> }
+function UsersIcon() { return <svg className="w-4 h-4 text-[#071411]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" /></svg> }
 function MoodIcon() { return <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm-.375 0h.008v.015h-.008V9.75zm5.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75zm-.375 0h.008v.015h-.008V9.75z" /></svg> }
 function CalendarIcon({ color = 'currentColor' }: { color?: string }) { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke={color} strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75" /></svg> }
 function SessionIcon({ color = 'currentColor' }: { color?: string }) { return <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke={color} strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> }
